@@ -1,0 +1,15 @@
+[
+  {
+    "id": "aa4a6c3d-298e-4b82-b0d8-aefaa1e6073f",
+    "status": true,
+    "thumbnails": [
+      "ruta/img1.jpg"
+    ],
+    "title": "Portátil Gamer",
+    "description": "Portátil de alta potencia para gaming.",
+    "code": "PGMR1020",
+    "price": 1500,
+    "stock": 25,
+    "category": "Computación"
+  }
+]
