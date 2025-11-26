@@ -1,9 +1,9 @@
 import { promises as fs } from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 
-class ProductManager {
+export class ProductManager {
     constructor(path) {
-        this.path = path;
+        this.path = path; 
     }
 
     async #readData() {
@@ -19,7 +19,7 @@ class ProductManager {
         await fs.writeFile(this.path, JSON.stringify(products, null, 2), 'utf8');
     }
 
-    async getProducts() {
+    async getAllProducts() { 
         return await this.#readData();
     }
 
@@ -29,6 +29,10 @@ class ProductManager {
         const missing = requiredFields.filter(field => !productData.hasOwnProperty(field));
         if (missing.length > 0) {
             throw new Error(`Faltan campos obligatorios: ${missing.join(', ')}`);
+        }
+        
+        if (products.some(p => p.code === productData.code)) {
+            throw new Error(`El código del producto '${productData.code}' ya existe.`);
         }
 
         const newProduct = {
@@ -62,18 +66,17 @@ class ProductManager {
         await this.#writeData(products);
         return products[index];
     }
+    
     async deleteProduct(id) {
         const products = await this.#readData();
         const initialLength = products.length;
-        const newProducts = products.filter(p => p.id !== id);
+        const newProducts = products.filter(p => p.id !== id); 
 
         if (newProducts.length === initialLength) {
-            return false; 
+            return false;
         }
 
         await this.#writeData(newProducts);
         return true;
     }
 }
-
-export default ProductManager;
