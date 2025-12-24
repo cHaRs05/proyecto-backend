@@ -1,26 +1,39 @@
 import { Router } from 'express';
-import { ProductManager } from '../../managers/ProductManager.js'; 
+import { productModel } from '../models/product.model.js';
+import { cartModel } from '../models/cart.model.js';
 
 const router = Router();
-const productManager = new ProductManager('./products.json'); 
-router.get('/', async (req, res) => {
+
+// Catálogo
+router.get('/products', async (req, res) => {
     try {
-        const products = await productManager.getAllProducts();
-        res.render('home', { products: products, title: "Lista de Productos con Handlebars" }); 
+        const { page = 1, limit = 10 } = req.query;
+        const result = await productModel.paginate({}, { page: parseInt(page), limit: parseInt(limit), lean: true });
+        res.render('products', { products: result.docs, ...result });
     } catch (error) {
-        console.error("Error al cargar la vista Home:", error);
-        res.status(500).send("Error al cargar la vista Home");
+        res.status(500).send("Error al cargar productos");
     }
 });
 
-router.get('/realtimeproducts', async (req, res) => {
+// Carrito
+router.get('/carts/:cid', async (req, res) => {
     try {
-        const products = await productManager.getAllProducts();
-        res.render('realTimeProducts', { products: products, title: "Productos en Tiempo Real (Socket.io)" }); 
+        const cart = await cartModel.findById(req.params.cid)
+            .populate('products.product') 
+            .lean(); 
+        
+        res.render('cartDetail', { 
+            products: cart.products, 
+            cartId: req.params.cid 
+        });
     } catch (error) {
-        console.error("Error al cargar la vista Real Time Products:", error);
-        res.status(500).send("Error al cargar la vista Real Time Products");
+        res.status(500).render('error', { error: 'Carrito no encontrado' });
     }
+});
+
+// Formulario Final
+router.get('/checkout', (req, res) => {
+    res.render('checkoutForm');
 });
 
 export default router;

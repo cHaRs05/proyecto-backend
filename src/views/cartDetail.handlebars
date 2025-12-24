@@ -1,0 +1,33 @@
+<div class="max-w-4xl mx-auto p-6">
+    <h1 class="text-3xl font-black mb-8">Tu Carrito de Compras</h1>
+
+    {{#if products.length}}
+        <div class="bg-white rounded-3xl shadow-lg p-8 border border-gray-100">
+            <ul class="divide-y divide-gray-100">
+                {{#each products}}
+                <li class="py-6 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-xl">{{this.product.title}}</h3>
+                        <p class="text-indigo-500">Cantidad: {{this.quantity}}</p>
+                    </div>
+                    <p class="font-black text-2xl">${{this.product.price}}</p>
+                </li>
+                {{/each}}
+            </ul>
+            
+            <div class="mt-8 border-t pt-6 flex justify-between items-center">
+                <span class="text-xl font-bold">Total:</span>
+                <span class="text-4xl font-black text-indigo-600">CALCULADO EN CHECKOUT</span>
+            </div>
+
+            <a href="/checkout" class="block text-center w-full mt-8 bg-indigo-600 text-white py-5 rounded-2xl font-bold hover:bg-indigo-700 transition uppercase tracking-widest text-lg">
+                FINALIZAR COMPRA
+            </a>
+        </div>
+    {{else}}
+        <div class="text-center py-20 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200">
+            <p class="text-gray-400 text-2xl font-medium">El carrito está vacío 🛒</p>
+            <a href="/products" class="mt-6 inline-block font-bold text-indigo-600">Volver a la tienda</a>
+        </div>
+    {{/if}}
+</div>

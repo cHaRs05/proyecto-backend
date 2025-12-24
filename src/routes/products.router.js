@@ -1,68 +1,57 @@
 import { Router } from 'express';
-import ProductManager from '../managers/ProductManager.js'; 
+import { productModel } from '../models/product.model.js';
 
 const router = Router();
-const productManager = new ProductManager('./products.json'); 
 
 router.get('/', async (req, res) => {
     try {
-        const products = await productManager.getProducts();
-        res.json({ products });
+        let { limit = 10, page = 1, sort, query } = req.query;
+        let filter = {};
+        
+        if (query) {
+            if (query === 'true' || query === 'false') {
+                filter = { status: query === 'true' };
+            } else {
+                filter = { category: query };
+            }
+        }
+
+        const options = {
+            limit: parseInt(limit),
+            page: parseInt(page),
+            lean: true, 
+            sort: sort ? { price: sort === 'asc' ? 1 : -1 } : {}
+        };
+
+        const result = await productModel.paginate(filter, options);
+        const baseUrl = `${req.protocol}://${req.get('host')}${req.baseUrl}`;
+        
+        res.send({
+            status: "success",
+            payload: result.docs,
+            totalPages: result.totalPages,
+            prevPage: result.prevPage,
+            nextPage: result.nextPage,
+            page: result.page,
+            hasPrevPage: result.hasPrevPage,
+            hasNextPage: result.hasNextPage,
+            prevLink: result.hasPrevPage ? `${baseUrl}?page=${result.prevPage}&limit=${limit}&sort=${sort || ''}&query=${query || ''}` : null,
+            nextLink: result.hasNextPage ? `${baseUrl}?page=${result.nextPage}&limit=${limit}&sort=${sort || ''}&query=${query || ''}` : null
+        });
+
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener productos' });
+        console.error(error);
+        res.status(500).send({ status: "error", error: "Error interno del servidor" });
     }
 });
 
 router.get('/:pid', async (req, res) => {
-    const { pid } = req.params; 
     try {
-        const product = await productManager.getProductById(pid);
-        if (product) {
-            res.json({ product });
-        } else {
-            res.status(404).json({ error: 'Producto no encontrado' });
-        }
+        const product = await productModel.findById(req.params.pid).lean();
+        if (!product) return res.status(404).send({ status: "error", error: "Producto no encontrado" });
+        res.send({ status: "success", payload: product });
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener el producto' });
-    }
-});
-
-router.post('/', async (req, res) => {
-    const newProductData = req.body;
-    try {
-        const newProduct = await productManager.addProduct(newProductData);
-        res.status(201).json({ message: 'Producto agregado exitosamente', product: newProduct });
-    } catch (error) {
-        res.status(400).json({ error: error.message });
-    }
-});
-
-router.put('/:pid', async (req, res) => {
-    const { pid } = req.params;
-    const updates = req.body;
-    try {
-        const updatedProduct = await productManager.updateProduct(pid, updates);
-        if (updatedProduct) {
-            res.json({ message: 'Producto actualizado exitosamente', product: updatedProduct });
-        } else {
-            res.status(404).json({ error: 'Producto no encontrado para actualizar' });
-        }
-    } catch (error) {
-        res.status(500).json({ error: 'Error al actualizar el producto' });
-    }
-});
-
-router.delete('/:pid', async (req, res) => {
-    const { pid } = req.params;
-    try {
-        const success = await productManager.deleteProduct(pid);
-        if (success) {
-            res.json({ message: 'Producto eliminado exitosamente' });
-        } else {
-            res.status(404).json({ error: 'Producto no encontrado para eliminar' });
-        }
-    } catch (error) {
-        res.status(500).json({ error: 'Error al eliminar el producto' });
+        res.status(500).send({ status: "error", error: error.message });
     }
 });
 

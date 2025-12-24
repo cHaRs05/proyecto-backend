@@ -2,6 +2,7 @@ const socket = io();
 const productList = document.getElementById('productList');
 const addForm = document.getElementById('addProductForm');
 const deleteForm = document.getElementById('deleteProductForm');
+
 socket.on('updateProducts', (products) => {
     console.log('Productos actualizados recibidos por Socket:', products);
     renderProducts(products);
@@ -10,7 +11,7 @@ socket.on('updateProducts', (products) => {
 const renderProducts = (products) => {
     productList.innerHTML = '';
 
-    if (products.length === 0) {
+    if (!products || products.length === 0) {
         productList.innerHTML = '<li class="text-gray-500 italic">No hay productos disponibles.</li>';
         return;
     }
@@ -23,7 +24,7 @@ const renderProducts = (products) => {
                 ${product.title} 
                 <span class="text-sm text-gray-500">($${product.price})</span>
             </span>
-            <span class="text-xs text-gray-400">ID: ${product.id.substring(0, 8)}...</span>
+            <span class="text-xs text-gray-400">ID: ${product._id}</span>
         `;
         productList.appendChild(listItem);
     });
@@ -47,6 +48,7 @@ addForm.addEventListener('submit', (e) => {
     addForm.reset();
 });
 
+// 2. Formulario de Eliminar Producto
 deleteForm.addEventListener('submit', (e) => {
     e.preventDefault();
     
