@@ -1,0 +1,58 @@
+<h1 style="margin-bottom: 30px;">Tienda de Hardware - Catálogo</h1>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
+    {{#each products.docs}}
+    <div style="border: 1px solid #ddd; padding: 20px; border-radius: 10px; width: 220px; text-align: center; background-color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s;">
+        <h3 style="height: 50px; overflow: hidden;">{{this.title}}</h3>
+        <p style="font-size: 14px; color: #666;">Categoría: {{this.category}}</p>
+        <p style="font-size: 20px; color: #2ecc71; font-weight: bold;">Precio: ${{this.price}}</p>
+        
+        <a href="/products/{{this._id}}" style="text-decoration: none; color: #3498db; font-size: 14px; display: block; margin-bottom: 10px;">Ver Detalles</a>
+        
+        <button 
+            onclick="addToCart('{{this._id}}')" 
+            style="background-color: #34495e; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold;"
+        >
+            🛒 Agregar al Carrito
+        </button>
+    </div>
+    {{/each}}
+</div>
+
+<div style="margin-top: 40px; text-align: center;">
+    {{#if products.hasPrevPage}}
+        <a href="{{products.prevLink}}" style="padding: 10px; text-decoration: none; background-color: #f1f1f1; border-radius: 5px;">⬅ Anterior</a>
+    {{/if}}
+
+    <span style="margin: 0 15px; font-weight: bold;">Página {{products.page}} de {{products.totalPages}}</span>
+
+    {{#if products.hasNextPage}}
+        <a href="{{products.nextLink}}" style="padding: 10px; text-decoration: none; background-color: #f1f1f1; border-radius: 5px;">Siguiente ➡</a>
+    {{/if}}
+</div>
+
+<script>
+    const MI_CARRITO_ID = "69c61609e967c8689ccfd1c5"; 
+
+    async function addToCart(productId) {
+        if (MI_CARRITO_ID === "TU_ID_AQUI") {
+            alert('❌ ERROR: Falta configurar el ID del carrito.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/carts/${MI_CARRITO_ID}/product/${productId}`, {
+                method: 'POST'
+            });
+            const result = await response.json();
+            
+            if (result.status === 'success') {
+                alert("✅ ¡Éxito! Componente de hardware añadido al carrito.");
+            } else {
+                alert("❌ Error: " + result.message);
+            }
+        } catch (error) {
+            console.error("Error al añadir al carrito:", error);
+        }
+    }
+</script>

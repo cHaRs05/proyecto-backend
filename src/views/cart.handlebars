@@ -1,0 +1,32 @@
+<h1>Tu Carrito de Compras</h1>
+
+{{#if cart.products.length}}
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background-color: #f4f4f4;">
+                <th style="padding: 10px; border: 1px solid #ddd;">Producto</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Cantidad</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Precio Unitario</th>
+                <th style="padding: 10px; border: 1px solid #ddd;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each cart.products}}
+            <tr>
+                <td style="padding: 10px; border: 1px solid #ddd;">{{this.product.title}}</td>
+                <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">{{this.quantity}}</td>
+                <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${{this.product.price}}</td>
+                <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">
+                    <button style="color: red;">Eliminar</button>
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    <div style="margin-top: 20px; text-align: right;">
+        <button style="background-color: #e74c3c; color: white; padding: 10px;">Vaciar Carrito</button>
+        <button style="background-color: #27ae60; color: white; padding: 10px;">Finalizar Compra</button>
+    </div>
+{{else}}
+    <p>Tu carrito está vacío. <a href="/products">¡Ve a comprar hardware!</a></p>
+{{/if}}
